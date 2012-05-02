@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<?xml-stylesheet type='text/xsl' href='./rfc2629.xslt' ?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'> 
+  <!ENTITY rfc3987 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3987.xml'>
+  <!ENTITY rfc3986 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>
+  <!ENTITY rfc5988 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.5988.xml'>
+  <!ENTITY astreams PUBLIC '' 'http://docs.opensocial.org/download/attachments/4358254/astreams.xml'>
+]>
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<?rfc private="Activity Streams Working Group"?>
+<rfc>
+  <front>
+    <title abbrev="ActivityStreams">Links for Activity Streams</title>
+
+    <author fullname="James M Snell" initials="J.M." surname="Snell">
+      <organization>IBM</organization>
+    </author>
+
+    <date month="April" year="2012" />
+
+    <abstract>
+      <t>This specification details an extension to the JSON Activity Streams
+      to express the serialization of arbitrary links to external resources 
+      based on the Link Relation model defined by RFC 5988.</t>
+    </abstract>
+
+  </front>
+
+  <middle>
+
+    <section title="Link Properties">
+    
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119" />.</t>
+    
+      <t>Section 3 of <xref target="RFC5988"/> defines a fundamental model
+      for Links associated with Web accessible resources. This specification 
+      applies that model as an optional extension to the JSON Activity Streams
+      formats.</t>
+      
+      <t>Any object included within an Activity Stream structure MAY contain
+      one or more extension properties whose names follow the "${rel}" naming
+      pattern where {rel} is any registered or extension link relation type
+      as defined by Section 4 of <xref target="RFC5988"/>; and whose value
+      is either a JSON String containing an absolute <xref target="RFC3987">IRI</xref>
+      that is the target of the link, or an array of JSON Strings containing 
+      absolute IRIs in the case where multiple links with the same Link Relation
+      must be specified.</t>
+      
+      <figure><preamble>For example:</preamble><artwork>
+  {
+    "totalItems": 10,
+    "$self" : "http://www.example.org/stream/page/1",
+    "$next" : "http://www.example.org/stream/page/2",
+    "$last" : "http://www.example.org/stream/page/10",
+    "items" : [
+      {
+        "objectType" : "activity",
+        "verb" : "post",
+        "actor" : {
+          "objectType" : "person",
+          "displayName" : "joe",
+          "id" : "acct:joe@example.org",
+          "$self": "http://www.example.org/profiles/json/joe",
+          "url": "http://www.example.org/profiles/html/joe"
+        },
+        "object" : {
+          "objectType" : "note",
+          "content" : "this note has links too",
+          "$self" : "http://www.example.org/notes/json/1",
+          "$http://example.com/ext/rel" : "http://.../foo",
+          "url" : "http://www.example.org/notes/html/1"
+        }
+      }
+    ]
+  }
+      </artwork></figure>
+      
+      <t>Implementations SHOULD interpret any field that begins with the
+      US-ASCII dollar sign ($) character a Link Property unless the value is 
+      anything other than a single absolute IRI or an array of absolute IRIs.</t>
+      
+      <t>When the value is specified as an array of absolute IRIs, the ordering
+      of values within the array is considered insignificant. Each contained
+      value is to be treated as a separate link. Values within the array SHOULD
+      NOT be duplicated.</t>
+      
+      <t>When using extension link relation types, the {rel} portion of the 
+      property name MAY be specified as an <xref target="RFC3987"/> IRI
+      but MUST be converted to <xref target="RFC3986">URIs</xref> when compared 
+      as required by Section 4.2 of <xref target="RFC5988"/>.</t>
+      
+      <t>As defined in Section 3 of <xref target="RFC5988"/>, such properties
+      can be viewed as statements of the form "The containing object has a 
+      {relation type} resource at {target IRI}" where the {relation type} is
+      identified by the property name minus the leading dollar sign character, 
+      and the {target IRI} is provided by the property value.</t>
+    
+    </section>
+   
+   
+    <section title="Security Considerations">
+      <t>The mechanisms defined herein are subject to the same security considerations
+      as all activities. The presence of Link properties within an object does
+      not, by itself, introduce new security considerations to the basic processing
+      of Activity Streams documents. However, when processing specific links of 
+      a given Link Relation Type, additional security considerations specific to
+      links of that type may apply. Implementors need to refer to the specifications
+      of each Link Relation Type to determine the relevant considerations.</t>     
+    </section>
+
+    <section title="License">
+    
+      <t>This Specification is made available under the Open Web 
+      Foundation Agreement Version 1.0, which is available at 
+      http://www.openwebfoundation.org/legal/.</t>
+
+      <t>You can review the signed copies of the Open Web Foundation 
+      Agreement Version 1.0 for this Specification at 
+      http://activitystrea.ms/licensing/, which may also include additional 
+      parties to the authors.</t>
+
+      <t>Your use of this Specification may be subject to other third party 
+      rights. THIS SPECIFICATION IS PROVIDED "AS IS." The contributors 
+      expressly disclaim any warranties (express, implied, or otherwise), 
+      including implied warranties of merchantability, non-infringement, 
+      fitness for a particular purpose, or title, related to the Specification. 
+      The entire risk as to implementing or otherwise using the Specification 
+      is assumed by the Specification implementer and user. IN NO EVENT WILL 
+      ANY PARTY BE LIABLE TO ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF 
+      INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER 
+      FROM ANY CAUSES OF ACTION OF ANY KIND WITH RESPECT TO THIS SPECIFICATION 
+      OR ITS GOVERNING AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT 
+      (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTY 
+      HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</t>
+    
+    </section>
+
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      &rfc2119;
+      &rfc3987;
+      &rfc3986;
+      &rfc5988;  
+    </references>
+  </back>
+</rfc>

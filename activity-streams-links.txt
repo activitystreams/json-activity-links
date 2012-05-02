@@ -1,0 +1,224 @@
+
+
+
+Activity Streams Working Group                                  J. Snell
+                                                                     IBM
+                                                          April 25, 2012
+
+
+                       Links for Activity Streams
+
+Abstract
+
+   This specification details an extension to the JSON Activity Streams
+   to express the serialization of arbitrary links to external resources
+   based on the Link Relation model defined by RFC 5988.
+
+
+Table of Contents
+
+   1.  Link Properties . . . . . . . . . . . . . . . . . . . . . . . . 2
+   2.  Security Considerations . . . . . . . . . . . . . . . . . . . . 3
+   3.  License . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+   4.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 1]
+
+                             ActivityStreams                  April 2012
+
+
+1.  Link Properties
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [RFC2119].
+
+   Section 3 of [RFC5988] defines a fundamental model for Links
+   associated with Web accessible resources.  This specification applies
+   that model as an optional extension to the JSON Activity Streams
+   formats.
+
+   Any object included within an Activity Stream structure MAY contain
+   one or more extension properties whose names follow the "${rel}"
+   naming pattern where {rel} is any registered or extension link
+   relation type as defined by Section 4 of [RFC5988]; and whose value
+   is either a JSON String containing an absolute IRI [RFC3987] that is
+   the target of the link, or an array of JSON Strings containing
+   absolute IRIs in the case where multiple links with the same Link
+   Relation must be specified.
+
+   For example:
+
+     {
+       "totalItems": 10,
+       "$self" : "http://www.example.org/stream/page/1",
+       "$next" : "http://www.example.org/stream/page/2",
+       "$last" : "http://www.example.org/stream/page/10",
+       "items" : [
+         {
+           "objectType" : "activity",
+           "verb" : "post",
+           "actor" : {
+             "objectType" : "person",
+             "displayName" : "joe",
+             "id" : "acct:joe@example.org",
+             "$self": "http://www.example.org/profiles/json/joe",
+             "url": "http://www.example.org/profiles/html/joe"
+           },
+           "object" : {
+             "objectType" : "note",
+             "content" : "this note has links too",
+             "$self" : "http://www.example.org/notes/json/1",
+             "$http://example.com/ext/rel" : "http://.../foo",
+             "url" : "http://www.example.org/notes/html/1"
+           }
+         }
+       ]
+     }
+
+
+
+Snell                                                           [Page 2]
+
+                             ActivityStreams                  April 2012
+
+
+   Implementations SHOULD interpret any field that begins with the US-
+   ASCII dollar sign ($) character a Link Property unless the value is
+   anything other than a single absolute IRI or an array of absolute
+   IRIs.
+
+   When the value is specified as an array of absolute IRIs, the
+   ordering of values within the array is considered insignificant.
+   Each contained value is to be treated as a separate link.  Values
+   within the array SHOULD NOT be duplicated.
+
+   When using extension link relation types, the {rel} portion of the
+   property name MAY be specified as an [RFC3987] IRI but MUST be
+   converted to URIs [RFC3986] when compared as required by Section 4.2
+   of [RFC5988].
+
+   As defined in Section 3 of [RFC5988], such properties can be viewed
+   as statements of the form "The containing object has a {relation
+   type} resource at {target IRI}" where the {relation type} is
+   identified by the property name minus the leading dollar sign
+   character, and the {target IRI} is provided by the property value.
+
+
+2.  Security Considerations
+
+   The mechanisms defined herein are subject to the same security
+   considerations as all activities.  The presence of Link properties
+   within an object does not, by itself, introduce new security
+   considerations to the basic processing of Activity Streams documents.
+   However, when processing specific links of a given Link Relation
+   Type, additional security considerations specific to links of that
+   type may apply.  Implementors need to refer to the specifications of
+   each Link Relation Type to determine the relevant considerations.
+
+
+3.  License
+
+   This Specification is made available under the Open Web Foundation
+   Agreement Version 1.0, which is available at
+   http://www.openwebfoundation.org/legal/.
+
+   You can review the signed copies of the Open Web Foundation Agreement
+   Version 1.0 for this Specification at
+   http://activitystrea.ms/licensing/, which may also include additional
+   parties to the authors.
+
+   Your use of this Specification may be subject to other third party
+   rights.  THIS SPECIFICATION IS PROVIDED "AS IS."  The contributors
+   expressly disclaim any warranties (express, implied, or otherwise),
+
+
+
+Snell                                                           [Page 3]
+
+                             ActivityStreams                  April 2012
+
+
+   including implied warranties of merchantability, non-infringement,
+   fitness for a particular purpose, or title, related to the
+   Specification.  The entire risk as to implementing or otherwise using
+   the Specification is assumed by the Specification implementer and
+   user.  IN NO EVENT WILL ANY PARTY BE LIABLE TO ANY OTHER PARTY FOR
+   LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF ACTION OF
+   ANY KIND WITH RESPECT TO THIS SPECIFICATION OR ITS GOVERNING
+   AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING
+   NEGLIGENCE), OR OTHERWISE, AND WHETHER OR NOT THE OTHER PARTY HAS
+   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+4.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, January 2005.
+
+   [RFC3987]  Duerst, M. and M. Suignard, "Internationalized Resource
+              Identifiers (IRIs)", RFC 3987, January 2005.
+
+   [RFC5988]  Nottingham, M., "Web Linking", RFC 5988, October 2010.
+
+
+Author's Address
+
+   James M Snell
+   IBM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Snell                                                           [Page 4]
+
